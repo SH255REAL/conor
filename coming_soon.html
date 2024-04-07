@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .video-background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .video-background {
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* Add transparency to container */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 80%;
+            max-width: 400px;
+            z-index: 1; /* Ensure form container appears above video */
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            width: 100%;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            border-color: #007bff;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="video-background-container">
+    <video class="video-background" autoplay loop muted>
+        <source src="71122-537102350.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+
+<div class="container">
+    <h2>Contact Us</h2>
+    <form id="contactForm" onsubmit="return validateForm()">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" required>
+        </div>
+        <div>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="errorMessage" class="error-message"></div>
+</div>
+
+<script>
+    function sendMessage(payload) {
+        const webhookUrl = 'https://discord.com/api/webhooks/1226605176438263868/uLIqr_eK6fEXHbuSiN4yYPTVqa58BHALP_kuspzdCn86hRVfZ5ES4oaPjnWaMtd-3tlk';
+
+        fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to send message to Discord');
+            }
+            alert('Your message has been sent successfully!');
+            document.getElementById('contactForm').reset(); // Reset the form
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while sending your message. Please try again later.');
+        });
+    }
+
+    function validateForm() {
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!name || !email || !subject || !message) {
+            displayErrorMessage('All fields are required!');
+            return false;
+        }
+
+        if (!emailPattern.test(email)) {
+            displayErrorMessage('Please enter a valid email address!');
+            return false;
+        }
+
+        const payload = {
+            content: `New contact form submission:\nName: ${name}\nEmail: ${email}\nSubject: ${subject}\nMessage: ${message}`
+        };
+
+        sendMessage(payload);
+        return false;
+    }
+
+    function displayErrorMessage(message) {
+        const errorMessageElement = document.getElementById('errorMessage');
+        errorMessageElement.textContent = message;
+    }
+</script>
+
+</body>
+</html>
